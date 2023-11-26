@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6rml2ff.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -33,6 +33,22 @@ async function run() {
       const result = await featuresCollection.find().toArray();
       res.send(result);
       //   console.log(result);
+    });
+
+    // update upvote
+    app.patch("/features/:id", async (req, res) => {
+      const id = req.params.id;
+      const latestVote = req.body.upVote;
+      const filter = { _id: new ObjectId(id) };
+
+      const updateDoc = {
+        $set: {
+          up_vote: latestVote,
+        },
+      };
+      const result = await featuresCollection.updateOne(filter, updateDoc);
+      console.log(result);
+      res.send(result);
     });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
