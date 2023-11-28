@@ -31,6 +31,7 @@ async function run() {
     const userCollection = client.db("techDB").collection("users");
     const productCollection = client.db("techDB").collection("products");
     const reviewCollection = client.db("techDB").collection("reviews");
+    const reportCollection = client.db("techDB").collection("reportedItems");
 
     //   get features items
     app.get("/features", async (req, res) => {
@@ -140,6 +141,14 @@ async function run() {
     app.get("/reviews", async (req, res) => {
       const result = await reviewCollection.find().toArray();
       res.send(result);
+    });
+
+    // reported items
+    app.post("/reports", async (req, res) => {
+      const item = req.body;
+      const result = await reportCollection.insertOne(item);
+      res.send(result);
+      console.log(result);
     });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
