@@ -28,6 +28,7 @@ async function run() {
     await client.connect();
     const featuresCollection = client.db("techDB").collection("featured");
     const trendingCollection = client.db("techDB").collection("trending");
+    const userCollection = client.db("techDB").collection("users");
 
     //   get features items
     app.get("/features", async (req, res) => {
@@ -66,12 +67,12 @@ async function run() {
       };
       const result = await trendingCollection.find(query, options).toArray();
       res.send(result);
-      console.log(result);
+      // console.log(result);
     });
     // update upvote for trending product
     app.patch("/trending/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
+      // console.log(id);
       const latestVote = req.body.upVote;
       const filter = { _id: new ObjectId(id) };
 
@@ -82,6 +83,17 @@ async function run() {
       };
       const result = await trendingCollection.updateOne(filter, updateDoc);
       // console.log(result);
+      res.send(result);
+    });
+    // add users
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const query = { email: user?.email };
+      const existUser = await userCollection.findOne(query);
+      if (existUser) {
+        return res.send({ message: "User already exist" });
+      }
+      const result = await userCollection.insertOne(user);
       res.send(result);
     });
 
