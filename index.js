@@ -30,6 +30,7 @@ async function run() {
     const trendingCollection = client.db("techDB").collection("trending");
     const userCollection = client.db("techDB").collection("users");
     const productCollection = client.db("techDB").collection("products");
+    const reviewCollection = client.db("techDB").collection("reviews");
 
     //   get features items
     app.get("/features", async (req, res) => {
@@ -117,6 +118,20 @@ async function run() {
         },
       };
       const result = await productCollection.updateOne(filter, updateDoc);
+      // console.log(result);
+      res.send(result);
+    });
+    // post review
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      // const user = req.body.userEmail;
+      // // console.log(user);
+      // const query = { userEmail: user };
+      // const existUser = await reviewCollection.findOne(query);
+      // if (existUser) {
+      //   return res.send({ message: "User already exist" });
+      // }
+      const result = await reviewCollection.insertOne(review);
       // console.log(result);
       res.send(result);
     });
