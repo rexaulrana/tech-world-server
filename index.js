@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 const port = process.env.PORT || 5000;
 
@@ -32,6 +33,16 @@ async function run() {
     const productCollection = client.db("techDB").collection("products");
     const reviewCollection = client.db("techDB").collection("reviews");
     const reportCollection = client.db("techDB").collection("reportedItems");
+
+    // jwt
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+        expiresIn: "2h",
+      });
+      res.send({ token });
+      // console.log(token);
+    });
 
     //   get features items
     app.get("/features", async (req, res) => {
@@ -102,6 +113,17 @@ async function run() {
 
     // get all products
     app.get("/products", async (req, res) => {
+      const filter = req.query;
+      // console.log(filter);
+      const query = {
+        tags: { $regex: `${filter.search}`, $options: "i" },
+      };
+      const options = {};
+      const result = await productCollection.find(query, options).toArray();
+      res.send(result);
+    });
+
+    app.get("/allProducts", async (req, res) => {
       const result = await productCollection.find().toArray();
       res.send(result);
     });
@@ -146,9 +168,15 @@ async function run() {
     // reported items
     app.post("/reports", async (req, res) => {
       const item = req.body;
+      const reportId = req.body.reportedId;
+      const filterReport = { reportedId: reportId };
+      const existReport = await reportCollection.findOne(filterReport);
+      if (existReport) {
+        return res.send({ message: "already reported" });
+      }
       const result = await reportCollection.insertOne(item);
       res.send(result);
-      console.log(result);
+      // console.log(existReport);
     });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
