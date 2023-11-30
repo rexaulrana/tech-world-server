@@ -10,7 +10,11 @@ const port = process.env.PORT || 5000;
 
 // middleware
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://tech-world-2e64e.web.app"],
+  })
+);
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6rml2ff.mongodb.net/?retryWrites=true&w=majority`;
@@ -133,12 +137,12 @@ async function run() {
 
     // get all trending products
     app.get("/trending", async (req, res) => {
-      const filter = req.query;
-      const query = {};
-      const options = {
-        sort: { up_vote: filter.query === "largest" ? 1 : -1 },
-      };
-      const result = await trendingCollection.find(query, options).toArray();
+      // const filter = req.query;
+      // const query = {};
+      // const options = {
+      //   sort: { up_vote: filter.query === "largest" ? 1 : -1 },
+      // };
+      const result = await trendingCollection.find().toArray();
       res.send(result);
       // console.log(result);
     });
