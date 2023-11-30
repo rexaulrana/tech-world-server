@@ -44,6 +44,18 @@ async function run() {
       // console.log(token);
     });
 
+    // user related apis
+    app.get("/user/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await userCollection.findOne(query);
+
+      res.send(result);
+      // console.log(result);
+    });
+
+    // products related apis
+
     //   get features items
     app.get("/features", async (req, res) => {
       const filter = req.query;
